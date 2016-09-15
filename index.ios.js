@@ -1,31 +1,32 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
 import {
   AppRegistry,
+  ScrollView,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 
+const tempList = ['one', 'two', 'three', 'four', 'five'];
+
 class MeetupRN extends Component {
   render() {
+    const attendeeList = tempList.map((item, index) => {
+      return (
+        <View key={`${item}-${index}`} style={{ 'height': 150 }}>
+          <Text>{item}</Text>
+        </View>
+      );
+    });
+
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
-          Welcome to React Native!
+          Welcome to MeetupRN!
         </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
+        <ScrollView style={styles.attendeeList}>
+          {attendeeList}
+        </ScrollView>
       </View>
     );
   }
@@ -34,9 +35,10 @@ class MeetupRN extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F5FCFF',
+  },
+  attendeeList: {
+    padding: 20,
   },
   welcome: {
     fontSize: 20,
