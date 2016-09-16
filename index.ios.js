@@ -6,15 +6,28 @@ import {
   Text,
   View
 } from 'react-native';
+import { getEvents } from './helpers/api';
 
-const tempList = ['one', 'two', 'three', 'four', 'five'];
 
 class MeetupRN extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      events: [],
+    };
+  }
+
+  componentWillMount() {
+    getEvents().then(events => this.setState({ events }));
+  }
+
   render() {
-    const attendeeList = tempList.map((item, index) => {
+    const { events } = this.state;
+    const attendeeList = events.map(item => {
       return (
-        <View key={`${item}-${index}`} style={{ 'height': 150 }}>
-          <Text>{item}</Text>
+        <View key={item.id} style={{ 'height': 150 }}>
+          <Text>{item.name}</Text>
         </View>
       );
     });
