@@ -33,40 +33,41 @@ export default class RsvpList extends Component {
   render() {
     const { people } = this.state;
     const { yesCount } = this.props;
-    const hosting = people.filter(person => person.member.event_context.host === true);
-    const going = people.filter(person => person.member.event_context.host === false);
+    const numHosts = people.filter(person => person.member.event_context.host === true).length;
 
-    const attendeeList = (group) => group.map(person =>
-      <View key={person.member.id} style={styles.attendeeContainer}>
-        {!!person.member.photo
-          ? <Image // if we have a photo property and it's not empty, display the image
-              style={styles.attendeeThumb}
-              source={{ uri: person.member.photo.thumb_link }}
-            />
-          : <Image // otherwise display the anonymous avatar
-              style={styles.attendeeThumb}
-              source={require('../assets/images/noPhoto.png')}
-            />
-        }
-        <View style={{ flex: 1 }}>
-          <Text style={styles.attendeeName}>{person.member.name} {person.guests ? `(+${person.guests})` : ''}</Text>
-          {group === hosting ? <Text style={styles.attendeeBio}>EVENT HOST</Text> : null}
-          {group === going && person.member.bio
-            ? <Text numberOfLines={1} style={styles.attendeeBio}>{person.member.bio}</Text>
-            : null
+    const attendeeList = (isHost) => people
+      .filter(person => person.member.event_context.host === isHost)
+      .map(person =>
+        <View key={person.member.id} style={styles.attendeeContainer}>
+          {!!person.member.photo
+            ? <Image // if we have a photo property and it's not empty, display the image
+                style={styles.attendeeThumb}
+                source={{ uri: person.member.photo.thumb_link }}
+              />
+            : <Image // otherwise display the anonymous avatar
+                style={styles.attendeeThumb}
+                source={require('../assets/images/noPhoto.png')}
+              />
           }
+          <View style={{ flex: 1 }}>
+            <Text style={styles.attendeeName}>{person.member.name} {person.guests ? `(+${person.guests})` : ''}</Text>
+            {isHost ? <Text style={styles.attendeeBio}>EVENT HOST</Text> : null}
+            {!isHost && person.member.bio
+              ? <Text numberOfLines={1} style={styles.attendeeBio}>{person.member.bio}</Text>
+              : null
+            }
+          </View>
         </View>
-      </View>
-    );
+      );
 
     return (
       <View style={styles.container}>
         <ScrollView style={styles.eventList}>
           <Text style={styles.header}>{this.props.eventName}</Text>
-          <Text style={styles.headerTwo}>{`${hosting.length} HOSTING`}</Text>
-          <View style={styles.attendeeOuter}>{attendeeList(hosting)}</View>
-          <Text style={styles.headerTwo}>{`${yesCount - hosting.length} GOING`}</Text>
-          <View style={styles.attendeeOuter}>{attendeeList(going)}</View>
+          <Text style={styles.headerTwo}>{`${numHosts} HOSTING`}</Text>
+          <View style={styles.attendeeOuter}>{attendeeList(true)}</View>
+          <Text style={styles.headerTwo}>{`${yesCount - numHosts} GOING`}</Text>
+          <View style={styles.attendeeOuter}>{attendeeList(false)}</View>
         </ScrollView>
       </View>
     );
