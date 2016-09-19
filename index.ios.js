@@ -13,9 +13,12 @@ class MeetupRN extends Component {
       <NavigatorIOS
         initialRoute={{
           component: EventList,
-          title: 'Events',
+          title: 'ReactJS Events',
         }}
         style={{ 'flex': 1 }}
+        barTintColor='#ed1c40'
+        titleTextColor='white'
+        tintColor='white'
       />
     );
   }

@@ -22,6 +22,7 @@ export default class RsvpList extends Component {
     eventId: PropTypes.string.isRequired,
     eventName: PropTypes.string.isRequired,
     navigator: PropTypes.object.isRequired,
+    yesCount: PropTypes.number.isRequired,
   }
 
   componentWillMount() {
@@ -31,26 +32,41 @@ export default class RsvpList extends Component {
 
   render() {
     const { people } = this.state;
-    const attendeeList = people.map(person =>
-      <View key={person.member.id}>
-        {!!person.member.photo // if we have a photo property and it's not empty, display the image
-          ? <Image
-              style={{ width: 40, height: 40 }}
+    const { yesCount } = this.props;
+    const hosting = people.filter(person => person.member.event_context.host === true);
+    const going = people.filter(person => person.member.event_context.host === false);
+
+    const attendeeList = (group) => group.map(person =>
+      <View key={person.member.id} style={styles.attendeeContainer}>
+        {!!person.member.photo
+          ? <Image // if we have a photo property and it's not empty, display the image
+              style={styles.attendeeThumb}
               source={{ uri: person.member.photo.thumb_link }}
             />
-          : null
+          : <Image // otherwise display the anonymous avatar
+              style={styles.attendeeThumb}
+              source={require('../assets/images/noPhoto.png')}
+            />
         }
-        <Text>{person.member.name}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.attendeeName}>{person.member.name} {person.guests ? `(+${person.guests})` : ''}</Text>
+          {group === hosting ? <Text style={styles.attendeeBio}>EVENT HOST</Text> : null}
+          {group === going && person.member.bio
+            ? <Text numberOfLines={1} style={styles.attendeeBio}>{person.member.bio}</Text>
+            : null
+          }
+        </View>
       </View>
     );
 
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          {this.props.eventName}
-        </Text>
         <ScrollView style={styles.eventList}>
-          {attendeeList}
+          <Text style={styles.header}>{this.props.eventName}</Text>
+          <Text style={styles.headerTwo}>{`${hosting.length} HOSTING`}</Text>
+          <View style={styles.attendeeOuter}>{attendeeList(hosting)}</View>
+          <Text style={styles.headerTwo}>{`${yesCount - hosting.length} GOING`}</Text>
+          <View style={styles.attendeeOuter}>{attendeeList(going)}</View>
         </ScrollView>
       </View>
     );
@@ -60,15 +76,46 @@ export default class RsvpList extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 64,
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#fafafa',
   },
-  attendeeList: {
-    padding: 20,
+  attendeeOuter: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#bbb',
   },
-  welcome: {
+  attendeeContainer: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#bbb',
+    paddingHorizontal: 10,
+  },
+  attendeeThumb: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#eee',
+    marginRight: 8,
+    marginVertical: 4,
+  },
+  attendeeName: {
+    fontSize: 16,
+  },
+  attendeeBio: {
+    fontSize: 13,
+    color: '#888',
+  },
+  header: {
     fontSize: 20,
-    textAlign: 'center',
+    fontWeight: 'bold',
     margin: 10,
+  },
+  headerTwo: {
+    color: '#777',
+    fontWeight: 'bold',
+    marginLeft: 10,
+    marginTop: 14,
+    marginBottom: 2,
   },
 });
